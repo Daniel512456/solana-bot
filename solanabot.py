@@ -1,17 +1,17 @@
+import os
+import re
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, ContextTypes, filters
 
-TOKEN = "8331539761:AAFWoSAkSZTWpCayukRV7BtUYWSBzgyXu7I"
-
+TOKEN = os.getenv("8331539761:AAFWoSAkSZTWpCayukRV7BtUYWSBzgyXu7I")
 WALLET = "AEk8J6coHJ6XDk3U1ib6jGYGPMY2L2qMKB3NmDbZJ8Dy"
 
-
-# When someone sends a message
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not update.message:
+    if not update.message or not update.message.text:
         return
 
     text = update.message.text.lower()
+    text = re.sub(r"\s+", " ", text).strip()
 
     if "anyone want some solana" in text:
         keyboard = [
@@ -24,22 +24,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
 
-
-# When a button is clicked
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
     if query.data == "give":
-        await query.message.edit_text(
-            f"donate here:\n{WALLET}"
-        )
-
+        await query.message.edit_text(f"💸 donate here:\n{WALLET}")
     elif query.data == "reject":
-        await query.message.edit_text("brokie")
+        await query.message.edit_text("brokie 💀")
 
-
-# Start bot
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
